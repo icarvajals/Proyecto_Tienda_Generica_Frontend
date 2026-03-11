@@ -1,0 +1,41 @@
+         /* === ESTILOS BASE === */
+         * {
+             margin: 0;
+             padding: 0;
+             box-sizing: border-box;
+             font-family: 'Poppins', sans-serif;
+         }
+
+         /* Ocultamos el scroll horizontal que a veces daña el modo móvil */
+         body {
+             min-height: 100vh;
+             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+             padding-top: 80px;
+             overflow-x: hidden;
+         }
+
+         /* Ajustes a la tarjeta para que no se vea gigante en el celular */
+         .main-content {
+             padding: 20px;
+             align-items: flex-start;
+             margin-top: 20px;
+             height: auto;
+         }
+
+         .welcome-card {
+             padding: 30px 20px;
+         }
+
+         .welcome-card h1 {
+             font-size: 22px;
+         }
+
+         .parrafo {
+             margin-top: 15px;
+         }
+
+                 /* === ÁREA DE CONTENIDO CENTRAL === */
+        .main-content { display: flex; justify-content: center; align-items: center; padding: 40px; height: calc(100vh - 80px); }
+        .welcome-card { background: rgba(255, 255, 255, 0.95); padding: 50px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2); text-align: center; max-width: 600px; width: 100%; }
+        .welcome-card h1 { color: #333; margin-bottom: 15px; font-size: 28px; }
+        .welcome-card p { color: #666; font-size: 16px; line-height: 1.6; }
