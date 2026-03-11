@@ -1,9 +1,10 @@
 import './App.css';
+import Clientes from './Cliente/clientes';
 
 function App() {
   return (
     <div>
-      <h1>Prueba Funcional</h1>
+      <Clientes></Clientes>
     </div>
   );
 }
