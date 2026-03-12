@@ -9,7 +9,7 @@ function MenuPrincipal() {
             <ul className="nav-links" id="navLinks">
                 <li><a href="usuarios.html">Usuarios</a></li>
                 <li><Link to="/clientes" className="active">Clientes</Link></li>
-                <li><a href="proveedores.html">Proveedores</a></li>
+                <li><Link to="/proveedores">Proveedores</Link></li>
                 <li><a href="productos.html">Productos</a></li>
                 <li><a href="ventas.html">Ventas</a></li>
                 <li><a href="reportes.html">Reportes</a></li>
