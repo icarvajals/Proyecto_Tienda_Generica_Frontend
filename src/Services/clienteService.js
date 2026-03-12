@@ -13,3 +13,11 @@ export const guardarCliente = (cliente) => {
 export const eliminarCliente = (id) => {
     return axios.delete(`${API_URL_BASE}/eliminar/${id}`);
 };
+
+export const buscarCliente = (cedula) => {
+    return axios.get(`${API_URL_BASE}/buscar/${cedula}`);
+}
+
+export const actualizarCliente = (cliente) => {
+    return axios.put(`${API_URL_BASE}/actualizar`, cliente);
+}

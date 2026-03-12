@@ -20,7 +20,6 @@ function ClienteModal({ cerrarModal, actualizarTabla }) {
     };
 
     const guardar = () => {
-
         guardarCliente(cliente)
         .then(() => {
             alert("Cliente guardado");

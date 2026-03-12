@@ -1,7 +1,7 @@
 import "../Cliente/clientes.css";
 import MenuPrincipal from "../Menu/menuPrincipal";
 import { useEffect, useState } from "react";
-import { listarClientes, eliminarCliente } from "../Services/clienteService";
+import { listarClientes, eliminarCliente, buscarCliente } from "../Services/clienteService";
 import ClienteModal from "./CrearCliente/crear_cliente";
 
 function Clientes() {
@@ -56,6 +56,30 @@ function Clientes() {
         }
 
     };
+
+    const [cliente, setCliente] = useState({
+        tipoDocumento: "",
+        cedulaCliente: "",
+        nombreCliente: "",
+        direccionCliente: "",
+        telefonoCliente: "",
+        emailCliente: ""
+    });
+
+    const [modoEditar, setModoEditar] = useState(false);
+
+
+    const editarCliente = async (cedula) => {
+        try {
+            const response = await buscarCliente(cedula);
+            setCliente(response.data);
+            setModoEditar(true);
+            setMostrarModal(true);
+        } catch (error) {
+            alert("Cliente no encontrado");
+        }
+    };
+
     return (
         <><MenuPrincipal></MenuPrincipal>
 
@@ -94,7 +118,7 @@ function Clientes() {
                                         <td className="row-actions">
                                             <button
                                                 className="btn-icon btn-edit"
-                                                title="Editar cliente"
+                                                title="Editar cliente" onClick={() => editarCliente(cliente.cedulaCliente)}
                                             >
                                                 ✏️
                                             </button>
