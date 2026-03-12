@@ -2,7 +2,7 @@ import "./proveedores.css";
 import MenuPrincipal from "../Menu/menuPrincipal";
 import { useEffect, useState } from "react";
 import { listarProveedores, eliminarProveedor, buscarProveedor } from "../Services/proveedorService";
-import ProveedorModal from "./CrearProveedor/crear_proveedor";
+import ProveedorModal from "../Proveedor/crear_proveedor/Crear_proveedor";
 
 function Proveedores() {
     const [proveedores, setProveedores] = useState([]);

@@ -5,10 +5,9 @@ function MenuPrincipal() {
     return (
         <nav className="navbar">
             <Link to="/bienvenida" className="logo">🛒 Tienda Genérica</Link>
-
             <ul className="nav-links" id="navLinks">
                 <li><a href="usuarios.html">Usuarios</a></li>
-                <li><Link to="/clientes" className="active">Clientes</Link></li>
+                <li><Link to="/clientes">Clientes</Link></li>
                 <li><Link to="/proveedores">Proveedores</Link></li>
                 <li><a href="productos.html">Productos</a></li>
                 <li><a href="ventas.html">Ventas</a></li>

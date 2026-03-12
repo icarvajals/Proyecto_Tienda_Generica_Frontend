@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { guardarProveedor, actualizarProveedor } from "../../Services/proveedorService";
-import "./crear_proveedor.css";
+import "../crear_proveedor/Crear_proveedor.css";
 
 function ProveedorModal({ cerrarModal, actualizarTabla, proveedorAEditar }) {
 

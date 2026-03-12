@@ -2,7 +2,7 @@ import './App.css';
 import Login from './Login/login';
 import Bienvenida from './Bienvenida/bienvenida';
 import Clientes from './Cliente/clientes';
-import Proveedor from './Proveedor/Proveedor';
+import Proveedores from './Proveedor/Proveedores';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 function App() {
@@ -12,8 +12,7 @@ function App() {
         <Route path='/' element={<Login />} />
         <Route path='/bienvenida' element={<Bienvenida />} />
         <Route path='/clientes' element={<Clientes />} />
-        {/* EL MAPA AHORA SABE A DÓNDE IR */}
-        <Route path='/proveedores' element={<Proveedor />} />
+        <Route path='/proveedores' element={<Proveedores />} />
       </Routes>
     </BrowserRouter>
   );
