@@ -2,6 +2,8 @@ import "../Cliente/clientes.css";
 import MenuPrincipal from "../Menu/menuPrincipal";
 import { useEffect, useState, useRef } from "react";
 import { listarProductos, eliminarProducto, guardarProducto } from "../Services/productoService";
+// IMPORTANTE: Importamos el servicio de proveedores para poder hacer la validación
+import { listarProveedores } from "../Services/proveedorService";
 
 function Productos() {
     const [productos, setProductos] = useState([]);
@@ -20,55 +22,76 @@ function Productos() {
             .catch((error) => console.error("Error cargando productos", error));
     };
 
-    const manejarCargaCSV = (e) => {
+    const manejarCargaCSV = async (e) => {
         const archivo = e.target.files[0];
         if (!archivo) return;
+
+        // 1. OBTENEMOS LOS PROVEEDORES DEL SISTEMA ANTES DE LEER EL CSV
+        let nitsValidos = [];
+        try {
+            const resProveedores = await listarProveedores();
+            // Guardamos solo los NITs en un arreglo para buscar fácilmente
+            nitsValidos = resProveedores.data.map(prov => prov.nitProveedor);
+        } catch (error) {
+            alert("Error al conectar con los proveedores. No se puede validar el CSV.");
+            e.target.value = null;
+            return;
+        }
 
         const lector = new FileReader();
         lector.onload = async (evento) => {
             const texto = evento.target.result;
             const lineas = texto.replace(/\r/g, '').split('\n').filter(linea => linea.trim() !== '');
             
-            let errores = 0;
+            let erroresServidor = 0;
             let subidos = 0;
-            let detalleError = "";
+            let alertasProveedor = []; // Aquí guardaremos los productos rechazados
 
-            // Empezamos desde i = 1 (omitiendo encabezados)
+            // 2. PROCESAMOS EL CSV DESDE LA FILA 1 (Omitiendo encabezados)
             for (let i = 1; i < lineas.length; i++) {
                 const columnas = lineas[i].split(/,|;/);
 
                 if (columnas.length >= 6) {
+                    const nitCsv = parseInt(columnas[2].trim());
+                    const nombreProd = columnas[1].trim();
+
+                    // 3. VALIDACIÓN ESTRICTA DEL PROVEEDOR
+                    if (!nitsValidos.includes(nitCsv)) {
+                        alertasProveedor.push(`El proveedor del producto ${nombreProd} no está en el sistema (NIT: ${nitCsv})`);
+                        continue; // Saltamos este producto y no lo enviamos a Java
+                    }
+
+                    // 4. SI EL PROVEEDOR EXISTE, ARMAMOS EL OBJETO (Igual al ProductoDTO)
                     const nuevoProducto = {
-    // Estos nombres deben ser IDÉNTICOS a los de tu ProductoDTO.java
-                    codigo_producto: parseInt(columnas[0].trim()),
-                    nombre_producto: columnas[1].trim(),
-                    nitproveedor: parseInt(columnas[2].trim()),
-                    precio_compra: parseInt(columnas[3].trim()),
-                    ivacompra: parseInt(columnas[4].trim()),
-                    precio_venta: parseInt(columnas[5].trim())
-};
+                        codigo_producto: parseInt(columnas[0].trim()),
+                        nombre_producto: nombreProd,
+                        nitproveedor: nitCsv,
+                        precio_compra: parseInt(columnas[3].trim()),
+                        ivacompra: parseInt(columnas[4].trim()),
+                        precio_venta: parseInt(columnas[5].trim())
+                    };
 
                     try {
                         await guardarProducto(nuevoProducto);
                         subidos++;
                     } catch (error) {
-                        errores++;
-                        // Capturamos el error para mostrártelo
-                        if (errores === 1) {
-                            detalleError = error.response 
-                                ? `Código: ${error.response.status} - Mensaje: ${JSON.stringify(error.response.data)}`
-                                : error.message;
-                        }
+                        erroresServidor++;
                     }
                 }
             }
             
-            if (errores > 0) {
-                alert(`Carga completada con advertencias:\n✅ Subidos: ${subidos}\n❌ Fallidos: ${errores}\n\nPrimer error detectado:\n${detalleError}`);
-            } else {
-                alert(`¡Éxito! Se cargaron ${subidos} productos correctamente.`);
+            // 5. REPORTE FINAL DE LA CARGA MASIVA
+            let mensajeFinal = `Carga completada.\n✅ Productos subidos: ${subidos}\n`;
+            
+            if (alertasProveedor.length > 0) {
+                mensajeFinal += `\n⚠️ PRODUCTOS RECHAZADOS (Proveedor Inexistente):\n` + alertasProveedor.join('\n');
+            }
+            
+            if (erroresServidor > 0) {
+                mensajeFinal += `\n❌ Fallos en Base de Datos: ${erroresServidor} (Códigos duplicados o error de red)`;
             }
 
+            alert(mensajeFinal);
             cargarProductos(); 
             e.target.value = null; 
         };
@@ -170,13 +193,13 @@ function Productos() {
 
             {mostrarConfirm && (
                 <div className="modal-overlay active">
-                    <div className="modal-card confirm-card">
-                        <div className="confirm-icon">⚠️</div>
+                    <div className="modal-card confirm-card" style={{ maxWidth: '400px', textAlign: 'center' }}>
+                        <div className="confirm-icon" style={{ fontSize: '40px', marginBottom: '15px' }}>⚠️</div>
                         <h3>¿Estás seguro?</h3>
-                        <p>¿Seguro que quieres eliminar este producto?</p>
-                        <div className="confirm-actions">
+                        <p style={{ color: '#666', marginBottom: '20px' }}>¿Seguro que quieres eliminar este producto?</p>
+                        <div className="confirm-actions" style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
                             <button className="btn-cancel" onClick={() => setMostrarConfirm(false)}>No, cancelar</button>
-                            <button className="btn-confirm-delete" onClick={confirmarEliminar}>Sí, eliminar</button>
+                            <button className="btn-delete" style={{ padding: '10px 20px', background: '#e74c3c', color: 'white', border: 'none', borderRadius: '5px' }} onClick={confirmarEliminar}>Sí, eliminar</button>
                         </div>
                     </div>
                 </div>

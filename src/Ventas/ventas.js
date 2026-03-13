@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import MenuPrincipal from "../Menu/menuPrincipal";
-import "../Cliente/clientes.css"; 
+import "./ventas.css";
 import { buscarCliente } from "../Services/clienteService";
 import { buscarProducto } from "../Services/productoService";
 import { guardarVenta, guardarDetalleVenta } from "../Services/ventaService";
@@ -8,13 +8,11 @@ import { guardarVenta, guardarDetalleVenta } from "../Services/ventaService";
 function Ventas() {
     const [cedulaCliente, setCedulaCliente] = useState("");
     const [nombreCliente, setNombreCliente] = useState("");
-
     const [productos, setProductos] = useState([
         { codigo: "", nombre: "", cantidad: "", precio: 0, iva: 0, valorTotal: 0 },
         { codigo: "", nombre: "", cantidad: "", precio: 0, iva: 0, valorTotal: 0 },
         { codigo: "", nombre: "", cantidad: "", precio: 0, iva: 0, valorTotal: 0 }
     ]);
-
     const [totalVenta, setTotalVenta] = useState(0);
     const [totalIva, setTotalIva] = useState(0);
     const [totalConIva, setTotalConIva] = useState(0);
@@ -25,7 +23,7 @@ function Ventas() {
         productos.forEach(p => {
             if (p.valorTotal > 0) {
                 subtotal += p.valorTotal;
-                ivaAcumulado += p.valorTotal * (p.iva / 100); 
+                ivaAcumulado += p.valorTotal * (p.iva / 100);
             }
         });
         setTotalVenta(Math.round(subtotal));
@@ -43,9 +41,7 @@ function Ventas() {
                 alert("Cliente no encontrado.");
                 setNombreCliente("");
             }
-        } catch (error) {
-            alert("Error al buscar el cliente.");
-        }
+        } catch (error) { alert("Error al buscar cliente."); }
     };
 
     const consultarProducto = async (index, codigo) => {
@@ -54,138 +50,103 @@ function Ventas() {
             const respuesta = await buscarProducto(codigo);
             if (respuesta.data) {
                 const nuevosProductos = [...productos];
-                nuevosProductos[index].nombre = respuesta.data.nombre_producto;
-                nuevosProductos[index].precio = respuesta.data.precio_venta;
-                nuevosProductos[index].iva = respuesta.data.ivacompra; 
-                const cant = nuevosProductos[index].cantidad;
-                if (cant > 0) {
-                    nuevosProductos[index].valorTotal = cant * respuesta.data.precio_venta;
+                nuevosProductos[index].nombre = respuesta.data.nombre_producto || respuesta.data.nombreProducto;
+                nuevosProductos[index].precio = respuesta.data.precio_venta || respuesta.data.precioVenta;
+                nuevosProductos[index].iva = respuesta.data.ivacompra ?? respuesta.data.ivaCompra ?? 0;
+                if (nuevosProductos[index].cantidad > 0) {
+                    nuevosProductos[index].valorTotal = nuevosProductos[index].cantidad * nuevosProductos[index].precio;
                 }
                 setProductos(nuevosProductos);
-            } else {
-                alert("Producto no encontrado.");
             }
-        } catch (error) {
-            alert("Error al buscar el producto.");
-        }
+        } catch (error) { alert("Producto no encontrado."); }
     };
 
     const manejarCantidad = (index, cantidad) => {
         const nuevosProductos = [...productos];
         nuevosProductos[index].cantidad = cantidad;
-        const cantNum = parseInt(cantidad) || 0;
-        nuevosProductos[index].valorTotal = cantNum * nuevosProductos[index].precio;
+        nuevosProductos[index].valorTotal = (parseInt(cantidad) || 0) * nuevosProductos[index].precio;
         setProductos(nuevosProductos);
     };
 
     const confirmarVenta = async () => {
-        if (!nombreCliente) {
-            alert("Consulta un cliente primero.");
-            return;
-        }
-
+        const cajero = localStorage.getItem("cedulaUsuario");
+        if (!cajero || !nombreCliente) { alert("Verifique cajero y cliente"); return; }
         try {
-            // PASO A: Guardar Venta
-            const nuevaVenta = {
+            const resVenta = await guardarVenta({
                 codigo_venta: 0,
                 cedula_cliente: parseInt(cedulaCliente),
-                cedula_usuario: 0, 
+                cedula_usuario: parseInt(cajero),
                 ivaventa: totalIva,
                 valor_venta: totalVenta,
                 total_venta: totalConIva
-            };
-            
-            console.log("Enviando Venta:", nuevaVenta);
-            const resVenta = await guardarVenta(nuevaVenta);
-            
-            // CAPTURA DEL ID CORREGIDA: Según tu DTO es codigo_venta
-            const codigoVentaGenerado = resVenta.data.codigo_venta; 
-            console.log("ID de Venta generado por DB:", codigoVentaGenerado);
-
-            // PASO B: Guardar Detalles (Nombres exactos de tu DetalleVentaDTO)
-            let detallesGuardados = 0;
-            for (let i = 0; i < productos.length; i++) {
-                const p = productos[i];
+            });
+            const idVenta = resVenta.data.codigo_venta;
+            for (let p of productos) {
                 if (p.codigo && p.cantidad > 0) {
-                    const nuevoDetalle = {
+                    await guardarDetalleVenta({
                         codigo_detalle_venta: 0,
                         codigo_producto: parseInt(p.codigo),
-                        codigo_venta: codigoVentaGenerado, // El ID que nos dio el paso anterior
+                        codigo_venta: idVenta,
                         cantidad_producto: parseInt(p.cantidad),
-                        valor_total: Math.round(p.valorTotal),
-                        valor_venta: Math.round(p.precio),
+                        valor_total: p.valorTotal,
+                        valor_venta: p.precio,
                         valoriva: Math.round(p.valorTotal * (p.iva / 100))
-                    };
-                    console.log(`Enviando Detalle ${i+1}:`, nuevoDetalle);
-                    await guardarDetalleVenta(nuevoDetalle);
-                    detallesGuardados++;
+                    });
                 }
             }
-
-            alert(`¡Venta #${codigoVentaGenerado} registrada con éxito!`);
-            window.location.reload(); 
-
-        } catch (error) {
-            console.error("Detalle del error:", error.response ? error.response.data : error.message);
-            alert("Error al guardar. Revisa que el servidor Java esté reportando éxito.");
-        }
+            alert("Venta guardada con éxito");
+            window.location.reload();
+        } catch (error) { alert("Error al guardar"); }
     };
 
     return (
         <>
             <MenuPrincipal />
-            <main className="main-content">
-                <div className="table-card" style={{ padding: '20px' }}>
-                    <h2 style={{ textAlign: 'center' }}>Módulo de Ventas</h2>
-                    
-                    <div style={{ display: 'flex', gap: '15px', marginBottom: '30px', alignItems: 'flex-end' }}>
-                        <div>
-                            <label>Cédula Cliente:</label>
-                            <input type="number" className="search-bar" value={cedulaCliente} onChange={(e) => setCedulaCliente(e.target.value)} />
-                        </div>
-                        <button className="btn-crear" onClick={consultarCliente}>Consultar</button>
-                        <div style={{ flex: 1 }}>
-                            <label>Nombre Cliente:</label>
-                            <input type="text" className="search-bar" value={nombreCliente} readOnly style={{ background: '#f5f5f5' }} />
+            <div className="main-content">
+                <div className="table-card">
+                    <div className="table-header"><h2>Nueva Venta</h2></div>
+                    <div className="search-section">
+                        <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 2fr', gap: '20px', alignItems: 'end'}}>
+                            <div>
+                                <label style={{display: 'block', marginBottom: '8px', fontWeight: '600'}}>Cédula Cliente</label>
+                                <input type="number" style={{width: '100%'}} value={cedulaCliente} onChange={(e) => setCedulaCliente(e.target.value)} />
+                            </div>
+                            <button className="btn-crear" onClick={consultarCliente}>Validar</button>
+                            <div>
+                                <label style={{display: 'block', marginBottom: '8px', fontWeight: '600'}}>Nombre del Cliente</label>
+                                <input type="text" style={{width: '100%', background: '#eee'}} value={nombreCliente} readOnly />
+                            </div>
                         </div>
                     </div>
-
-                    <table style={{ width: '100%', marginBottom: '30px' }}>
+                    <table>
                         <thead>
-                            <tr>
-                                <th>Cod. Producto</th>
-                                <th>Buscar</th>
-                                <th>Nombre Producto</th>
-                                <th>Cant.</th>
-                                <th>Vlr. Total</th>
-                            </tr>
+                            <tr><th>Código</th><th>Acción</th><th>Producto</th><th>Cant.</th><th>Subtotal</th></tr>
                         </thead>
                         <tbody>
-                            {productos.map((p, index) => (
-                                <tr key={index}>
-                                    <td><input type="number" style={{ width: '100%', padding: '5px' }} value={p.codigo} onChange={(e) => {
-                                        const n = [...productos]; n[index].codigo = e.target.value; setProductos(n);
-                                    }}/></td>
-                                    <td><button className="btn-icon" onClick={() => consultarProducto(index, p.codigo)}>🔍</button></td>
-                                    <td><input type="text" style={{ width: '100%', padding: '5px', background: '#f5f5f5' }} value={p.nombre} readOnly /></td>
-                                    <td><input type="number" style={{ width: '80px', padding: '5px' }} value={p.cantidad} onChange={(e) => manejarCantidad(index, e.target.value)}/></td>
-                                    <td><input type="text" style={{ width: '120px', padding: '5px', background: '#f5f5f5' }} value={`$${p.valorTotal}`} readOnly /></td>
+                            {productos.map((p, i) => (
+                                <tr key={i}>
+                                    <td><input type="number" value={p.codigo} onChange={(e) => {
+                                        const n = [...productos]; n[i].codigo = e.target.value; setProductos(n);
+                                    }} /></td>
+                                    <td><button className="btn-crear" style={{padding: '5px 15px'}} onClick={() => consultarProducto(i, p.codigo)}>🔍</button></td>
+                                    <td><input type="text" value={p.nombre} readOnly style={{background: '#f9f9f9', border: 'none'}} /></td>
+                                    <td><input type="number" value={p.cantidad} onChange={(e) => manejarCantidad(i, e.target.value)} /></td>
+                                    <td style={{fontWeight: 'bold'}}>${p.valorTotal.toLocaleString()}</td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
-
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <button className="btn-crear" onClick={confirmarVenta}>✅ Confirmar Venta</button>
-                        <div style={{ width: '250px', background: '#f8f9fa', padding: '15px', borderRadius: '5px', border: '1px solid #ddd' }}>
-                            <div>Total Venta: ${totalVenta}</div>
-                            <div>Total IVA: ${totalIva}</div>
-                            <hr />
-                            <strong>Total con IVA: ${totalConIva}</strong>
+                    <div style={{display: 'flex', justifyContent: 'space-between', marginTop: '30px', alignItems: 'center'}}>
+                        <button className="btn-crear" style={{padding: '15px 40px', fontSize: '18px'}} onClick={confirmarVenta}>Finalizar Compra</button>
+                        <div className="total-box">
+                            <p>Subtotal: <strong>${totalVenta.toLocaleString()}</strong></p>
+                            <p>IVA (19%): <strong>${totalIva.toLocaleString()}</strong></p>
+                            <hr style={{borderColor: '#444'}} />
+                            <h3 style={{margin: 0}}>TOTAL: ${totalConIva.toLocaleString()}</h3>
                         </div>
                     </div>
                 </div>
-            </main>
+            </div>
         </>
     );
 }

@@ -1,8 +1,116 @@
-/* Hereda los estilos de clientes.css para la tabla */
-.ventas-container { padding: 40px; display: flex; flex-direction: column; gap: 20px; align-items: center; }
-.venta-header-card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 1100px; }
-.info-row { display: flex; gap: 20px; margin-bottom: 20px; align-items: flex-end; }
-.resumen-footer { display: flex; justify-content: flex-end; margin-top: 20px; }
-.totales-tabla { width: 300px; border-radius: 12px; overflow: hidden; border: 1px solid #e1e5ee; }
-.totales-tabla td { padding: 10px; font-weight: 600; }
-.total-highlight { background: #667eea; color: white; }
+/* 1. Eliminamos el fondo blanco feo de la etiqueta principal */
+.main-content {
+    background: transparent !important; /* La clave: hace que el contenedor sea invisible para dejar ver tu fondo */
+    padding: 40px 20px;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* 2. Transformamos la caja blanca en una tarjeta oscura elegante (Efecto Cristal) */
+.table-card {
+    background: rgba(0, 0, 0, 0.3); /* Negro semi-transparente */
+    backdrop-filter: blur(10px); /* Difumina un poco lo que hay detrás */
+    -webkit-backdrop-filter: blur(10px);
+    width: 100%;
+    max-width: 1100px;
+    border-radius: 15px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4); /* Sombra para dar profundidad */
+    border: 1px solid rgba(255, 255, 255, 0.05); /* Borde súper sutil */
+    padding: 30px;
+    color: white; /* Todas las letras dentro de la tarjeta serán blancas */
+}
+
+/* 3. Títulos con el color azul bonito de React */
+.table-header h2 {
+    color: #61dafb;
+    font-size: 26px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(97, 218, 251, 0.2);
+    padding-bottom: 10px;
+}
+
+/* 4. Tablas adaptadas al fondo oscuro */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table thead th {
+    background: rgba(0, 0, 0, 0.4);
+    color: #61dafb; /* Azul React */
+    padding: 15px;
+    text-align: left;
+    font-size: 14px;
+    text-transform: uppercase;
+    border-bottom: 2px solid #61dafb;
+}
+
+table tbody td {
+    padding: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    color: #e1e1e1;
+}
+
+table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.05); /* Brillo suave al pasar el mouse */
+}
+
+/* 5. Botones modernos */
+.btn-crear {
+    background-color: #61dafb;
+    color: #282c34; /* Texto oscuro para contrastar con el botón azul */
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 14px;
+}
+
+.btn-crear:hover {
+    background-color: #4fa8c7;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(97, 218, 251, 0.3);
+}
+
+/* 6. Inputs oscuros para la sección de buscar */
+.search-section {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+}
+
+input[type="number"], input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    color: white;
+    transition: 0.3s;
+}
+
+input[type="number"]:focus, input[type="text"]:focus {
+    border-color: #61dafb;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(97, 218, 251, 0.2);
+}
+
+/* Caja de totales en ventas */
+.total-box {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 10px;
+    text-align: right;
+    border: 1px solid rgba(97, 218, 251, 0.2);
+}
+
+.total-box h3 {
+    color: #61dafb;
+    margin-top: 10px;
+}

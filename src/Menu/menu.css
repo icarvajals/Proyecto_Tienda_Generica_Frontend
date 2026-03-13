@@ -1,20 +1,163 @@
-  /* === ESTILOS BASE === */
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-        body { min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding-top: 80px; overflow-x: hidden; }
- 
- /* === BARRA DE NAVEGACIÓN === */
-    .navbar { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); width: 100%; height: 70px; position: fixed; top: 0; left: 0; display: flex; justify-content: space-between; align-items: center; padding: 0 40px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); z-index: 1000; }
+/* ========================================================
+   1. BARRA SUPERIOR (NAVBAR) - COMPACTA Y ALINEADA
+   ======================================================== */
+.navbar {
+    background-color: #ffffff !important;
+    width: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+    top: 0 !important;
+    position: fixed !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 0 40px !important;
+    height: 60px !important; /* Altura profesional */
+    box-sizing: border-box !important;
+    z-index: 4000 !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1) !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+}
 
-    .logo { font-size: 20px; font-weight: 600; color: #333; display: flex; align-items: center; gap: 10px; text-decoration: none; }
+/* AJUSTE LOGO Y NOMBRE: Más arriba y centrado verticalmente */
+.navbar .logo {
+    color: #1e293b !important;
+    font-weight: 800 !important;
+    font-size: 20px !important;
+    text-decoration: none !important;
+    display: flex !important;
+    align-items: center !important;
+    margin-top: -5px !important; /* Subimos un poco el logo y nombre */
+    z-index: 4100 !important;
+}
 
-    .nav-links { display: flex; list-style: none; gap: 10px; }
+/* ========================================================
+   2. ENLACES DE NAVEGACIÓN (ESCRITORIO)
+   ======================================================== */
+.nav-links {
+    display: flex !important;
+    gap: 10px !important;
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    align-items: center !important;
+}
 
-    .nav-links a { text-decoration: none; color: #555; font-weight: 500; font-size: 15px; padding: 8px 16px; border-radius: 8px; transition: all 0.3s ease; display: block; }
+.nav-links li a {
+    color: #475569 !important;
+    font-weight: 600 !important;
+    text-decoration: none !important;
+    padding: 8px 15px !important;
+    border-radius: 8px !important;
+    font-size: 14px !important;
+    transition: all 0.2s ease !important;
+}
 
-    .nav-links a:hover, .nav-links a.active { background: rgba(102, 126, 234, 0.1); color: #667eea; }
+.nav-links li a:hover {
+    background-color: #f1f5f9 !important;
+    color: #4338ca !important;
+}
 
-    .btn-logout { background: #ffe5e5; color: #d63031; padding: 8px 20px; border-radius: 8px; text-decoration: none; font-weight: 500; font-size: 14px; transition: all 0.3s ease; }
+/* ========================================================
+   3. BOTÓN SALIR CON ANIMACIÓN PREMIUM
+   ======================================================== */
+.desktop-only { display: block !important; }
+.mobile-only { display: none !important; }
 
-    .btn-logout:hover { background: #d63031; color: white; }
+.btn-logout.desktop-only {
+    background: rgba(239, 68, 68, 0.08) !important;
+    color: #ef4444 !important;
+    padding: 8px 22px !important;
+    border: 1.5px solid rgba(239, 68, 68, 0.2) !important;
+    border-radius: 50px !important;
+    font-weight: 700 !important;
+    font-size: 12px !important;
+    text-decoration: none !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1) !important;
+    margin-top: -5px !important; /* Alineado con el logo arriba */
+}
 
+/* Animación de "Brillo" y "Pulso" al pasar el mouse */
+.btn-logout.desktop-only:hover {
+    background: #ef4444 !important;
+    color: #ffffff !important;
+    transform: translateY(-3px) scale(1.05) !important;
+    box-shadow: 0 10px 20px rgba(239, 68, 68, 0.4) !important;
+    border-color: #ef4444 !important;
+}
 
+.btn-logout.desktop-only:active {
+    transform: translateY(-1px) scale(0.98) !important;
+    box-shadow: 0 5px 10px rgba(239, 68, 68, 0.2) !important;
+}
+
+/* ========================================================
+   4. INTERFAZ MÓVIL (MENÚ LATERAL)
+   ======================================================== */
+.menu-icon {
+    display: none;
+    font-size: 26px;
+    cursor: pointer;
+    color: #1e293b;
+    z-index: 4100 !important;
+    margin-top: -5px !important; /* Alineado arriba */
+}
+
+@media (max-width: 850px) {
+    .desktop-only { display: none !important; }
+    .mobile-only { display: block !important; }
+
+    .navbar { padding: 0 20px !important; }
+
+    .menu-icon { display: block !important; }
+
+    .navbar .logo {
+        margin-left: 10px !important;
+        margin-top: -5px !important;
+    }
+
+    /* MENÚ LATERAL */
+    .nav-links {
+        position: fixed !important;
+        top: 60px !important;
+        left: -320px !important;
+        width: 280px !important;
+        height: calc(100vh - 60px) !important;
+        background-color: #ffffff !important;
+        flex-direction: column !important;
+        justify-content: flex-start !important;
+        padding: 20px !important;
+        box-sizing: border-box !important;
+        transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        z-index: 3500 !important;
+        box-shadow: 5px 0 15px rgba(0,0,0,0.1) !important;
+        border-right: 1px solid #e2e8f0 !important;
+    }
+
+    .nav-links.active { left: 0 !important; }
+
+    /* BOTÓN SALIR MÓVIL CON ANIMACIÓN DE PULSO */
+    .btn-logout-mobile {
+        background: linear-gradient(135deg, #f87171 0%, #ef4444 100%) !important;
+        color: #ffffff !important;
+        display: block !important;
+        padding: 15px !important;
+        border-radius: 15px !important;
+        text-align: center !important;
+        text-decoration: none !important;
+        font-weight: 800 !important;
+        text-transform: uppercase;
+        margin-top: 25px !important;
+        animation: pulseButton 2s infinite; /* Animación de atención */
+    }
+}
+
+@keyframes pulseButton {
+    0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}

@@ -1,75 +1,67 @@
-import "../Login/login.css";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import axios from "axios";
+import "./login.css"; 
 
 function Login() {
+    const [cedula, setCedula] = useState("");
+    const [password, setPassword] = useState("");
     const navigate = useNavigate();
 
-    const[usuario, setUsuario] = useState("");
-    const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
-
-    const iniciarSesion = async (e) => {
+    const manejarLogin = async (e) => {
         e.preventDefault();
 
-        const datos = {
-            id: usuario,
-            contraseña: password
-        };
+        if (!cedula || !password) {
+            alert("Por favor, ingresa tu cédula y contraseña.");
+            return;
+        }
 
         try {
-            const respuesta = await fetch("http://localhost:8081/usuarios/login", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(datos)
-            });
-
-            const texto = await respuesta.text();
-
-            if (texto.includes("Login correcto")) {
+            const respuesta = await axios.get(`http://localhost:8081/usuarios/buscar/${cedula}`);
+            
+            if (respuesta.data && respuesta.data.password === password) {
+                localStorage.setItem("cedulaUsuario", respuesta.data.cedulaUsuario);
+                localStorage.setItem("nombreUsuario", respuesta.data.nombreUsuario);
+                
                 navigate("/bienvenida");
             } else {
-                setError(texto);
+                alert("Usuario o contraseña incorrectos.");
             }
-
         } catch (error) {
-            setError("Error conectando con el servidor");
+            alert("Usuario no encontrado o error de conexión con el servidor.");
         }
     };
 
     return (
-        <div className="login-card">
-            <h2>Tienda Genérica</h2>
-
-            {error && (
-            <div id="mensaje-error" className="error-message">
-                {error}
+        <div className="login-container">
+            <div className="login-card">
+                <h2>🛒 Tienda Genérica</h2>
+                <h3>Iniciar Sesión</h3>
+                
+                <form onSubmit={manejarLogin}>
+                    <div className="input-group">
+                        <label>Cédula de Usuario</label>
+                        <input 
+                            type="number" 
+                            value={cedula} 
+                            onChange={(e) => setCedula(e.target.value)} 
+                        />
+                    </div>
+                    
+                    <div className="input-group">
+                        <label>Contraseña</label>
+                        <input 
+                            type="password" 
+                            value={password} 
+                            onChange={(e) => setPassword(e.target.value)} 
+                        />
+                    </div>
+                    
+                    <button type="submit" className="btn-crear">
+                        Ingresar al Sistema
+                    </button>
+                </form>
             </div>
-            )}
-
-            <form id="loginForm" onSubmit={iniciarSesion}>
-                <div className="input-group">
-                    <label for="usuario">Usuario</label>
-                    <input type="text" id="usuario" placeholder="Ingresa tu usuario"
-                    value={usuario} onChange={(e) => setUsuario(e.target.value)} required />
-                </div>
-
-                <div className="input-group">
-                    <label for="password">Contraseña</label>
-                    <input type="password" id="password" value={password} 
-                    onChange={(e) => setPassword(e.target.value)} required />
-                </div>
-
-                <div class="button-group">
-                    <button type="submit" className="btn-primary">Aceptar</button>
-                    <button type="button" className="btn-secondary" id="btnCancelar" onClick={() => {
-                            setUsuario("");
-                            setPassword("");
-                        }}>Cancelar</button>
-                </div>
-            </form>
         </div>
     );
 }

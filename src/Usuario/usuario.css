@@ -1,0 +1,26 @@
+
+        /* === CONTENEDOR DE LA TABLA === */
+        .main-content { padding: 40px; display: flex; justify-content: center; }
+        .table-card { background: rgba(255, 255, 255, 0.95); padding: 30px 40px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2); width: 100%; max-width: 1100px; }
+        .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
+        .table-header h2 { color: #333; font-weight: 600; }
+        .table-actions { display: flex; gap: 15px; width: 100%; max-width: 500px; }
+        .search-bar { flex: 1; padding: 10px 15px; border: 2px solid #e1e5ee; border-radius: 10px; outline: none; transition: border 0.3s ease; font-size: 14px;}
+        .search-bar:focus { border-color: #667eea; }
+        .btn-crear { background: #2ecc71; color: white; border: none; padding: 10px 20px; border-radius: 10px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3); white-space: nowrap; text-align: center;}
+        .btn-crear:hover { background: #27ae60; transform: translateY(-2px); }
+
+        /* === TABLA === */
+        table { width: 100%; border-collapse: collapse; text-align: left; min-width: 700px; }
+        th { background: #f8f9fa; color: #555; padding: 15px; font-weight: 600; font-size: 14px; border-bottom: 2px solid #e1e5ee; }
+        td { padding: 15px; border-bottom: 1px solid #e1e5ee; color: #333; font-size: 14px; vertical-align: middle; }
+        tr:hover { background: #f1f3f6; }
+        .doc-badge { background: #eef2ff; color: #5a6fd6; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; margin-right: 8px; }
+        .pwd-container { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: #f8f9fa; padding: 5px 10px; border-radius: 6px; }
+        .pwd-text { font-family: monospace; letter-spacing: 2px; }
+        .btn-eye { background: none; border: none; cursor: pointer; font-size: 16px; transition: transform 0.2s; }
+        .btn-eye:hover { transform: scale(1.1); }
+        .row-actions { display: flex; gap: 8px; }
+        .btn-icon { width: 32px; height: 32px; border: none; border-radius: 6px; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: all 0.2s; color: white; }
+        .btn-edit { background: #f39c12; } .btn-edit:hover { background: #d68910; }
+        .btn-delete { background: #e74c3c; } .btn-delete:hover { background: #c0392b; }
