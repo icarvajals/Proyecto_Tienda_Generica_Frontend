@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL_BASE = "http://localhost:8081/usuarios";
+const API_URL_BASE = "http://localhost:8084/usuarios";
 
 export const guardarUsuario = (usuario) => {
     return axios.post(`${API_URL_BASE}/guardar`, usuario);
@@ -20,4 +20,9 @@ export const actualizarUsuario = (usuario) => {
 
 export const eliminarUsuario = (id) => {
     return axios.delete(`${API_URL_BASE}/eliminar/${id}`);
+};
+
+// 👇 ESTA ES LA FUNCIÓN QUE FALTABA 👇
+export const loginUsuario = (credenciales) => {
+    return axios.post(`${API_URL_BASE}/login`, credenciales);
 };

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL_BASE = "http://localhost:8081/clientes";
+const API_URL_BASE = "http://localhost:8089/clientes";
 
 export const listarClientes = () => {
     return axios.get(`${API_URL_BASE}/listar`);

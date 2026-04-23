@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+// Importamos las funciones de tu servicio en lugar de usar axios directamente aquí
+import { buscarUsuario, loginUsuario } from "../Services/usuarioService"; 
 import "./login.css"; 
 
 function Login() {
@@ -17,18 +18,40 @@ function Login() {
         }
 
         try {
-            const respuesta = await axios.get(`http://localhost:8081/usuarios/buscar/${cedula}`);
-            
-            if (respuesta.data && respuesta.data.password === password) {
-                localStorage.setItem("cedulaUsuario", respuesta.data.cedulaUsuario);
-                localStorage.setItem("nombreUsuario", respuesta.data.nombreUsuario);
+            // 1. Enviamos los datos al backend usando la estructura que espera Java (LoginRequest)
+            const credenciales = {
+                id: parseInt(cedula), // Convertimos a número porque en Java tu ID es numérico
+                contraseña: password
+            };
+
+            const respuestaLogin = await loginUsuario(credenciales);
+
+            // 2. Validamos la respuesta exacta (String) que devuelve tu UsuarioController
+            if (respuestaLogin.data === "Login correcto" || respuestaLogin.data === "Login correcto - admin inicial") {
                 
+                // 3. Guardamos datos en localStorage
+                try {
+                    // Intentamos traer los datos completos del usuario para el localStorage
+                    const datosUsuario = await buscarUsuario(cedula);
+                    localStorage.setItem("cedulaUsuario", datosUsuario.data.cedulaUsuario || cedula);
+                    localStorage.setItem("nombreUsuario", datosUsuario.data.nombreUsuario || "Usuario");
+                } catch (err) {
+                    // Si es el admin inicial, puede que no esté en la base de datos aún, le damos valores por defecto
+                    localStorage.setItem("cedulaUsuario", cedula);
+                    localStorage.setItem("nombreUsuario", "Administrador");
+                }
+                
+                // 4. Redirigimos a la bienvenida
                 navigate("/bienvenida");
+
             } else {
-                alert("Usuario o contraseña incorrectos.");
+                // Si Java responde "Usuario o contraseña incorrectos"
+                alert(respuestaLogin.data); 
             }
+
         } catch (error) {
-            alert("Usuario no encontrado o error de conexión con el servidor.");
+            console.error("Error en login:", error);
+            alert("Error de conexión con el servidor. Verifica que ms-usuarios esté encendido.");
         }
     };
 

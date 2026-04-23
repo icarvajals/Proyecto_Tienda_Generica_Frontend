@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL_BASE = "http://localhost:8081/api/productos"; 
+const API_URL_BASE = "http://localhost:8082/api/productos"; 
 
 // Creamos una instancia de axios configurada para enviar JSON
 const api = axios.create({

@@ -35,19 +35,37 @@ function Reportes() {
             (resCli.data || []).forEach(c => { mapa[c.cedulaCliente] = c.nombreCliente; });
             setClientesMap(mapa);
 
-            const res = await axios.get("http://localhost:8081/api/ventas/listar");
+            const res = await axios.get("http://localhost:8085/ventas/listar");
             setDatos(res.data || []);
-        } catch (e) { setDatos([]); }
+        } catch (e) { 
+            console.error("Error cargando ventas", e);
+            setDatos([]); 
+        }
     };
 
+    // SOLUCIÓN: React trae la lista de detalles y la filtra sin tocar el back
     const verDetalleIndividual = async (idVenta) => {
         try {
-            const res = await axios.get(`http://localhost:8081/api/ventas/detalle/${idVenta}`);
-            setDetalleFactura({ id: idVenta, items: res.data || [] });
-        } catch (e) { alert("Error al cargar detalle"); }
+            const res = await axios.get("http://localhost:8085/api/detalleventas/listar");
+            
+            // Filtramos solo los productos de esta factura específica
+            const detallesDeEstaFactura = res.data.filter(d => d.codigo_venta === idVenta);
+            
+            // Lo mapeamos al formato que espera la tabla
+            const items = detallesDeEstaFactura.map(d => [
+                `Prod. #${d.codigo_producto}`, // Como no tenemos el nombre, mostramos el código
+                d.cantidad_producto,
+                d.valor_venta,
+                d.valor_total
+            ]);
+
+            setDetalleFactura({ id: idVenta, items: items });
+        } catch (e) { 
+            alert("Error al cargar detalle de los productos."); 
+            console.error(e);
+        }
     };
 
-    // Lógica de Checkboxes
     const handleSeleccionarTodos = (e) => {
         if (e.target.checked) {
             const todos = datos.map(v => v.codigo_venta || v.cedulaCliente);
@@ -63,7 +81,7 @@ function Reportes() {
         );
     };
 
-    // REPORTE MAESTRO FILTRADO
+    // SOLUCIÓN: Hacemos lo mismo para el PDF
     const generarReporteSeleccionado = async () => {
         if (seleccionados.length === 0) return alert("Por favor, selecciona al menos un registro para exportar.");
         
@@ -96,10 +114,20 @@ function Reportes() {
             });
             ventana.document.write('</tbody></table>');
         } else {
-            for (let v of datosFiltrados) {
-                try {
-                    const res = await axios.get(`http://localhost:8081/api/ventas/detalle/${v.codigo_venta}`);
-                    const items = res.data || [];
+            try {
+                // Traemos todos los detalles una sola vez para que el PDF cargue rápido
+                const resDetalles = await axios.get("http://localhost:8085/api/detalleventas/listar");
+                const todosLosDetalles = resDetalles.data || [];
+
+                for (let v of datosFiltrados) {
+                    const detallesDeEstaFactura = todosLosDetalles.filter(d => d.codigo_venta === v.codigo_venta);
+                    const items = detallesDeEstaFactura.map(d => [
+                        `Prod. #${d.codigo_producto}`,
+                        d.cantidad_producto,
+                        d.valor_venta,
+                        d.valor_total
+                    ]);
+
                     const nombreCli = clientesMap[v.cedula_cliente] || "No registrado";
                     ventana.document.write(`
                         <div class="venta-box">
@@ -108,7 +136,7 @@ function Reportes() {
                                 <span>Cliente: ${nombreCli} (${v.cedula_cliente})</span>
                             </div>
                             <table>
-                                <thead><tr><th>Producto</th><th>Cant.</th><th>Precio Un.</th><th>Subtotal</th></tr></thead>
+                                <thead><tr><th>Producto (Código)</th><th>Cant.</th><th>Precio Un.</th><th>Subtotal</th></tr></thead>
                                 <tbody>
                                     ${items.map(it => `<tr><td>${it[0]}</td><td>${it[1]}</td><td>$${it[2].toLocaleString()}</td><td>$${it[3].toLocaleString()}</td></tr>`).join('')}
                                     <tr class="total-line"><td colspan="3">TOTAL VENTA:</td><td>$${v.total_venta.toLocaleString()}</td></tr>
@@ -116,9 +144,10 @@ function Reportes() {
                             </table>
                         </div>
                     `);
-                } catch (e) { console.error(e); }
-            }
+                }
+            } catch (e) { console.error("Error generando detalles para el PDF", e); }
         }
+        
         ventana.document.write('</body></html>');
         ventana.document.close();
         setTimeout(() => ventana.print(), 1000);
@@ -135,7 +164,6 @@ function Reportes() {
                             <button className="btn-crear" onClick={cargarClientes}>Cargar Clientes</button>
                             <button className="btn-crear" style={{background: '#2ecc71'}} onClick={cargarVentas}>Cargar Ventas</button>
                             
-                            {/* Botón con nombre normal que no cambia */}
                             {datos.length > 0 && (
                                 <button className="btn-crear" style={{background: '#4338ca'}} onClick={generarReporteSeleccionado}>
                                     Exportar PDF 📄
@@ -195,7 +223,7 @@ function Reportes() {
                                     <button onClick={() => setDetalleFactura(null)} style={{background: '#64748b', color: '#fff', border: 'none', borderRadius: '5px', padding: '5px 10px', cursor: 'pointer'}}>Cerrar</button>
                                 </div>
                                 <table>
-                                    <thead><tr><th>Producto</th><th>Cant.</th><th>Precio Un.</th><th>Subtotal</th></tr></thead>
+                                    <thead><tr><th>Producto (Código)</th><th>Cant.</th><th>Precio Un.</th><th>Subtotal</th></tr></thead>
                                     <tbody>
                                         {detalleFactura.items.map((it, i) => (
                                             <tr key={i}>
