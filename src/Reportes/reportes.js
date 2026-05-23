@@ -35,7 +35,7 @@ function Reportes() {
             (resCli.data || []).forEach(c => { mapa[c.cedulaCliente] = c.nombreCliente; });
             setClientesMap(mapa);
 
-            const res = await axios.get("http://localhost:8085/ventas/listar");
+            const res = await axios.get("https://ms-ventas-production.up.railway.app/ventas/listar");
             setDatos(res.data || []);
         } catch (e) { 
             console.error("Error cargando ventas", e);
@@ -46,7 +46,7 @@ function Reportes() {
     // SOLUCIÓN: React trae la lista de detalles y la filtra sin tocar el back
     const verDetalleIndividual = async (idVenta) => {
         try {
-            const res = await axios.get("http://localhost:8085/api/detalleventas/listar");
+            const res = await axios.get("https://ms-ventas-production.up.railway.app/api/detalleventas/listar");
             
             // Filtramos solo los productos de esta factura específica
             const detallesDeEstaFactura = res.data.filter(d => d.codigo_venta === idVenta);
@@ -116,7 +116,7 @@ function Reportes() {
         } else {
             try {
                 // Traemos todos los detalles una sola vez para que el PDF cargue rápido
-                const resDetalles = await axios.get("http://localhost:8085/api/detalleventas/listar");
+                const resDetalles = await axios.get("https://ms-ventas-production.up.railway.app/api/detalleventas/listar");
                 const todosLosDetalles = resDetalles.data || [];
 
                 for (let v of datosFiltrados) {
