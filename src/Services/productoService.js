@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL_BASE = "https://ms-productos-production.up.railway.app/api/productos"; 
+const API_URL_BASE = `${process.env.REACT_APP_API_PRODUCTOS}/api/productos`; 
 
 // Creamos una instancia de axios configurada para enviar JSON
 const api = axios.create({

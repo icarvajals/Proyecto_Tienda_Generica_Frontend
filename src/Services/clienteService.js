@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL_BASE = "https://ms-clientes-production.up.railway.app/clientes";
+const API_URL_BASE = `${process.env.REACT_APP_API_CLIENTES}/clientes`;
 
 export const listarClientes = () => {
     return axios.get(`${API_URL_BASE}/listar`);

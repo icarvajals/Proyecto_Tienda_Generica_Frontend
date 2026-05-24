@@ -1,7 +1,8 @@
 import axios from "axios";
 
-const VENTA_API_URL = "https://ms-ventas-production.up.railway.app/ventas"; 
-const DETALLE_API_URL = "https://ms-ventas-production.up.railway.app/api/detalleventas";
+const VENTA_API_URL = `${process.env.REACT_APP_API_VENTAS}/ventas`; 
+const DETALLE_API_URL =  `${process.env.REACT_APP_API_VENTAS}/api/detalleventas`;
+
 
 const apiVentas = axios.create({
     headers: { 'Content-Type': 'application/json' }

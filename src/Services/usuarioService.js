@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL_BASE = "https://ms-usuarios-production-4ebc.up.railway.app/usuarios";
+const API_URL_BASE = `${process.env.REACT_APP_API_USUARIOS}/usuarios`;
 
 export const guardarUsuario = (usuario) => {
     return axios.post(`${API_URL_BASE}/guardar`, usuario);
